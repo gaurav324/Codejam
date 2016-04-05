@@ -49,10 +49,10 @@ typedef std::unordered_map<int, long> iimap;
 typedef std::unordered_map<string, long> simap;
 typedef std::unordered_map<long, string> ismap;
 template <typename K, typename V>
-bool mfind(std::unordered_map<K, V> map, V value) {
+bool mfind(std::unordered_map<K, V> map, K value) {
 	auto search = map.find(value);
 	if (search == map.end()) {
-	  return false;
+		return false;
 	} else {
 		return true;
   }
@@ -81,3 +81,67 @@ bool is_match(string pattern, string word) {
 }
 
 // Main Logic
+class dir {
+public:
+	hash<string, dir> dirs;
+};
+
+int main() {
+	int t, n, m;
+	cin >> t;
+	fori(t) {
+		int count = 0;		
+
+		cin >> n;
+		cin >> m;
+		string path;
+		hash<string, dir> root_dirs;
+
+		forj(n) {
+			cin >> path;
+			vector<string> splits = split(path, '/');	
+			dir* next_dir = NULL;
+
+			if (mfind(root_dirs, splits[1])) {
+				next_dir = &root_dirs[splits[1]];
+			} else {
+				root_dirs[splits[1]] = dir();
+				next_dir = &root_dirs[splits[1]];
+			}
+	
+			for(int xx=2; xx < splits.size(); ++xx) {
+				string next_folder = splits[xx];
+				if (mfind(next_dir->dirs, next_folder)) {
+					next_dir = &(next_dir->dirs[next_folder]);
+				}	else {
+					next_dir->dirs[next_folder] = dir();
+					next_dir = &(next_dir->dirs[next_folder]);
+				}
+			}
+		}
+
+		forj(m) {
+			cin >> path;
+			vector<string> splits = split(path, '/');	
+			dir* next_dir = NULL;
+			if (mfind(root_dirs, splits[1])) {
+				next_dir = &root_dirs[splits[1]];
+			} else {
+				++count;
+				root_dirs[splits[1]] = dir();
+				next_dir = &root_dirs[splits[1]];
+			}
+			for(int xx=2; xx < splits.size(); ++xx) {
+				string next_folder = splits[xx];
+				if (mfind(next_dir->dirs, next_folder)) {
+					next_dir = &(next_dir->dirs[next_folder]);
+				}	else {
+					++count;
+					next_dir->dirs[next_folder] = dir();
+					next_dir = &(next_dir->dirs[next_folder]);
+				}
+			}
+		}
+		cout << "Case #" << i+1 << ": " << count << endl;
+	}	
+}
